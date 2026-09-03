@@ -1,12 +1,23 @@
 @echo ON
 
+:: Makefile.vc predates Windows ARM64 and otherwise falls back to /machine:x86.
+if "%target_platform%" == "win-arm64" (
+    set "NMAKE_PLATFORM=ARM64"
+) else (
+    set "NMAKE_PLATFORM=x64"
+)
+
 mkdir release\
-mkdir release\x64
-mkdir release\x64\pkg-config
-nmake /f Makefile.vc CFG=release GLIB_PREFIX=%LIBRARY_PREFIX%
+nmake /f Makefile.vc CFG=release PLAT=%NMAKE_PLATFORM% LDFLAGS_ARCH=/machine:%NMAKE_PLATFORM% GLIB_PREFIX=%LIBRARY_PREFIX%
 if errorlevel 1 exit 1
 
-copy release\x64\pkg-config.exe %LIBRARY_PREFIX%\bin\pkg-config.exe
+dumpbin /headers release\%NMAKE_PLATFORM%\pkg-config.exe > pkg-config-headers.txt
+if errorlevel 1 exit 1
+type pkg-config-headers.txt
+findstr /I /C:"machine (%NMAKE_PLATFORM%)" pkg-config-headers.txt
+if errorlevel 1 exit 1
+
+copy release\%NMAKE_PLATFORM%\pkg-config.exe %LIBRARY_PREFIX%\bin\pkg-config.exe
 if errorlevel 1 exit 1
 
 :: Copy the [de]activate scripts to %PREFIX%\etc\conda\[de]activate.d.
