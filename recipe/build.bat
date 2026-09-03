@@ -7,7 +7,9 @@ if "%target_platform%" == "win-arm64" (
     set "NMAKE_PLATFORM=x64"
 )
 
-mkdir release\
+if not exist release mkdir release
+if not exist release\%NMAKE_PLATFORM% mkdir release\%NMAKE_PLATFORM%
+if not exist release\%NMAKE_PLATFORM%\pkg-config mkdir release\%NMAKE_PLATFORM%\pkg-config
 nmake /f Makefile.vc CFG=release PLAT=%NMAKE_PLATFORM% LDFLAGS_ARCH=/machine:%NMAKE_PLATFORM% GLIB_PREFIX=%LIBRARY_PREFIX%
 if errorlevel 1 exit 1
 
