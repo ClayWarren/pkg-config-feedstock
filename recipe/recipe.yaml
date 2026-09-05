@@ -41,12 +41,10 @@ tests:
         - pkg-config
   - script:
       - pkg-config --help
-      - if: win
-        then: pkg-config --modversion glib-2.0
+      - pkg-config --modversion glib-2.0
     requirements:
       run:
-        - if: win
-          then: glib-tools
+        - glib-tools
 
 about:
   homepage: http://www.freedesktop.org/wiki/Software/pkg-config/
